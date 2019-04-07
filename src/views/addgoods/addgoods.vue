@@ -1,77 +1,79 @@
 <template>
   <el-form ref="form" :model="goodsList" label-width="150px">
-  <el-form-item clearable required label="商品名称/规格">
-    <el-input v-model="goodsList.name"></el-input>
-  </el-form-item>
-  <el-form-item clearable required label="副标题">
-    <el-input v-model="goodsList.subTitle"></el-input>
-  </el-form-item>
+    <el-form-item clearable required label="商品名称/规格">
+      <el-input v-model="goodsList.name"></el-input>
+    </el-form-item>
+    <el-form-item clearable required label="副标题">
+      <el-input v-model="goodsList.subTitle"></el-input>
+    </el-form-item>
     <el-form-item clearable required label="价格">
-    <el-input v-model="goodsList.price"></el-input>
-  </el-form-item>    
-  <el-form-item clearable required label="原价">
-    <el-input v-model="goodsList.oldPrice"></el-input>
-  </el-form-item>
-  <el-form-item clearable required label="库存">
-    <el-input v-model="goodsList.amount"></el-input>
-  </el-form-item>
-  <el-form-item required label="分类"> 
-    <el-select multiple :multiple-limit='multipleLimit' v-model="goodsList.classifyValue" placeholder="请选择">
-      <el-option
-        v-for="item in classify"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value">
-      </el-option>
-    </el-select>
-  </el-form-item>
-  <el-form-item label='是否为轮播图'>
-    <el-switch
-      v-model="goodsList.sliderView"
-      active-color="#13ce66"
-      inactive-color="#ff4949">
-    </el-switch>
-  </el-form-item>
-  <el-form-item v-if='goodsList.sliderView' required label='上传轮播图'>
-    <el-upload
-      action="http://up-z1.qiniup.com"
-      :data="uploadForm"
-      list-type="picture-card"
-      :before-upload='beforeUpload'
-      :on-success='handleSlider'
-      :limit='titleLimit'
-      :on-exceed='onExceed'>
-      <i class="el-icon-plus"></i>
-    </el-upload>
-    <el-row class='sliderNote'>
-      （轮播图只能显示最近上传的三个商品！！！）
-    </el-row>
-  </el-form-item>
-  <el-form-item required label="上传头图">
-    <el-upload
-      action="http://up-z1.qiniup.com"
-      :data="uploadForm"
-      list-type="picture-card"
-      :before-upload='beforeUpload'
-      :on-success='handleTitle'
-      :limit='titleLimit'
-      :on-exceed='onExceed'>
-      <i class="el-icon-plus"></i>
-    </el-upload>
-  </el-form-item>
+      <el-input v-model="goodsList.price"></el-input>
+    </el-form-item>
+    <el-form-item clearable required label="原价">
+      <el-input v-model="goodsList.oldPrice"></el-input>
+    </el-form-item>
+    <el-form-item clearable required label="库存">
+      <el-input v-model="goodsList.amount"></el-input>
+    </el-form-item>
+    <el-form-item required label="分类">
+      <el-select
+        multiple
+        :multiple-limit="multipleLimit"
+        v-model="goodsList.classifyValue"
+        placeholder="请选择"
+      >
+        <el-option
+          v-for="item in classify"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="是否为轮播图">
+      <el-switch v-model="goodsList.sliderView" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+    </el-form-item>
+    <el-form-item v-if="goodsList.sliderView" required label="上传轮播图">
+      <el-upload
+        action="http://up-z1.qiniup.com"
+        :data="uploadForm"
+        list-type="picture-card"
+        :before-upload="beforeUpload"
+        :on-success="handleSlider"
+        :limit="titleLimit"
+        :on-exceed="onExceed"
+      >
+        <i class="el-icon-plus"></i>
+      </el-upload>
+      <el-row class="sliderNote">（轮播图只能显示最近上传的三个商品！！！）</el-row>
+    </el-form-item>
+    <el-form-item required label="上传头图">
+      <el-upload
+        action="http://up-z1.qiniup.com"
+        :data="uploadForm"
+        list-type="picture-card"
+        :before-upload="beforeUpload"
+        :on-success="handleTitle"
+        :limit="titleLimit"
+        :on-exceed="onExceed"
+      >
+        <i class="el-icon-plus"></i>
+      </el-upload>
+    </el-form-item>
     <el-form-item required label="上传详情图">
-    <el-upload
-      action="http://up-z1.qiniup.com"
-      :data="uploadForm"
-      list-type="picture-card"
-      :before-upload='beforeUpload'
-      :on-success='handleDetails'>
-      <i class="el-icon-plus"></i>
-    </el-upload>
-  </el-form-item>
-  <el-form-item>
-    <el-button type="primary" @click="onSubmit">立即创建</el-button>
-  </el-form-item>
+      <el-upload
+        action="http://up-z1.qiniup.com"
+        :data="uploadForm"
+        list-type="picture-card"
+        :before-upload="beforeUpload"
+        :on-success="handleDetails"
+      >
+        <i class="el-icon-plus"></i>
+      </el-upload>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="onSubmit">立即创建</el-button>
+    </el-form-item>
   </el-form>
 </template>
 
@@ -154,6 +156,7 @@ export default {
       axios.post("/uploadMes", { goodsList: this.goodsList }).then(res => {
         if (res.data === "ok") {
           alert("上传成功！");
+          location.reload();
         }
       });
     },
@@ -170,15 +173,15 @@ export default {
     },
     // 上传图片成功以后获取图片的 url
     handleTitle(response, file, fileList) {
-      const titleUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      const titleUrl = "https://cdn.hhp.im/" + response.key;
       this.goodsList.titleUrl = titleUrl;
     },
     handleDetails(response, file, fileList) {
-      var detailsUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      var detailsUrl = "https://cdn.hhp.im/" + response.key;
       this.goodsList.detailsUrl.push(detailsUrl);
     },
     handleSlider(response, file, fileList) {
-      var sliderUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      var sliderUrl = "https://cdn.hhp.im/" + response.key;
       this.goodsList.sliderUrl = sliderUrl;
     }
   }
