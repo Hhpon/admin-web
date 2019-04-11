@@ -47,6 +47,7 @@
 
 <script>
 import axios from "axios";
+import { setTimeout } from "timers";
 export default {
   data() {
     return {
@@ -75,15 +76,22 @@ export default {
         .then(() => {
           axios
             .post("http://127.0.0.1:7001/ship", {
-              out_trade_no: this.orderDetail.out_trade_no
+              out_trade_no: this.orderDetail.out_trade_no,
+              status: "待收货"
             })
             .then(res => {
-              if (res.data === "发货成功") {
+              if (res.data === "ok") {
                 this.$message({
                   type: "success",
                   message: "发货成功!"
                 });
                 this.$router.push({ path: "/orders" });
+                setTimeout(() => {
+                  axios.post("http://127.0.0.1:7001/ship", {
+                    out_trade_no: this.orderDetail.out_trade_no,
+                    status: "已完成"
+                  });
+                }, 1296000000);
               }
             });
         })
