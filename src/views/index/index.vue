@@ -4,7 +4,7 @@
     <el-container>
       <el-aside width="200px">
         <el-menu
-        default-active="addgoods"
+        :default-active="defaultActive"
         class="el-menu-vertical-demo"
         background-color="#545c64"
         text-color="#fff"
@@ -35,7 +35,20 @@
 
 <script>
 export default {
-  methods: {}
+  data() {
+    return{
+      defaultActive: 'addgoods'
+    }
+  },
+  created() {
+    console.log(this.$route.path.substring(1));
+    this.setActive();
+  },
+  methods: {
+    setActive() {
+      this.defaultActive = this.$route.path.substring(1)
+    }
+  }
 };
 </script>
 
