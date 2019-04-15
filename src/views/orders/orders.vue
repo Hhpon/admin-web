@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-table :data="orders" stripe style="width: 100%">
+      <el-table :data="orders" stripe style="width: 100%;">
         <el-table-column align="center" prop="out_trade_no" label="订单号"></el-table-column>
         <el-table-column align="center" prop="address.userName" label="收件人"></el-table-column>
         <el-table-column align="center" prop="address.telNumber" label="联系电话"></el-table-column>
@@ -43,7 +43,12 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row);
-      if (row.status === "待收货" || row.status === "待发货") {
+      if (
+        row.status === "待付款" ||
+        row.status === "待收货" ||
+        row.status === "待发货" ||
+        row.status === "退款中"
+      ) {
         this.$message({
           type: "success",
           message: "订单进行中，不可删除!"
@@ -80,8 +85,16 @@ export default {
     },
     getOrders() {
       axios.get("http://127.0.0.1:7001/getOrder").then(res => {
-        console.log(res);
-        this.orders = res.data.reverse();
+        let refundOrder = [];
+        let othersOrder = [];
+        for (var i = 0; i < res.data.length; i++) {
+          if (res.data[i].status === "退款中") {
+            refundOrder.unshift(res.data[i]);
+          } else {
+            othersOrder.unshift(res.data[i]);
+          }
+        }
+        this.orders = refundOrder.concat(othersOrder);
       });
     }
   }
