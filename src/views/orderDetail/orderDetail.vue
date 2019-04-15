@@ -16,7 +16,8 @@
           style="color:#fd2844;display:flex;justify-content:space-between;align-items:center;"
         >
           {{orderDetail.status}}
-          <el-button v-show="showBtn" type="danger" size="mini" @click="changeOrderStatus()">发货</el-button>
+          <el-button v-show="shipBtn" type="danger" size="mini" @click="ship()">发货</el-button>
+          <el-button v-show="refundBtn" type="danger" size="mini" @click="refund()">同意退款</el-button>
         </div>
         <div class="item">{{orderDetail.address.userName}}</div>
         <div class="item">{{orderDetail.address.telNumber}}</div>
@@ -52,7 +53,8 @@ export default {
   data() {
     return {
       orderDetail: {},
-      showBtn: false
+      shipBtn: false,
+      refundBtn: false
     };
   },
   mounted() {
@@ -61,13 +63,20 @@ export default {
   methods: {
     getOrderDetail() {
       this.orderDetail = this.$route.params.orderDetail;
+      console.log(this.orderDetail);
       if (this.orderDetail.status === "待发货") {
-        this.showBtn = true;
+        this.shipBtn = true;
+        this.refundBtn = false;
+      } else if (this.orderDetail.status === "退款中") {
+        this.shipBtn = false;
+        this.refundBtn = true;
       } else {
-        this.showBtn = false;
+        this.shipBtn = false;
+        this.refundBtn = false;
       }
     },
-    changeOrderStatus() {
+    // 发货
+    ship() {
       this.$confirm("是否确认发货?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -75,7 +84,7 @@ export default {
       })
         .then(() => {
           axios
-            .post("http://127.0.0.1:7001/ship", {
+            .post("http://127.0.0.1:7001/changeStatus", {
               out_trade_no: this.orderDetail.out_trade_no,
               status: "待收货"
             })
@@ -87,7 +96,7 @@ export default {
                 });
                 this.$router.push({ path: "/orders" });
                 setTimeout(() => {
-                  axios.post("http://127.0.0.1:7001/ship", {
+                  axios.post("http://127.0.0.1:7001/changeStatus", {
                     out_trade_no: this.orderDetail.out_trade_no,
                     status: "已完成"
                   });
@@ -99,6 +108,68 @@ export default {
           this.$message({
             type: "info",
             message: "已取消发货"
+          });
+        });
+    },
+
+    // 退款
+    refund() {
+      this.$confirm("是否确认同意退款?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // 根据下单时间设置商户退款单号
+          let myDate = new Date();
+          let year = myDate.getFullYear().toString();
+          let month =
+            (myDate.getMonth() + 1).toString().length === 1
+              ? "0" + (myDate.getMonth() + 1).toString()
+              : (myDate.getMonth() + 1).toString();
+          let date =
+            myDate.getDate().toString().length === 1
+              ? "0" + myDate.getDate().toString()
+              : myDate.getDate().toString();
+          let time = myDate.getTime().toString();
+          let out_refund_no = "re" + year + month + date + time;
+
+          axios
+            .post("http://127.0.0.1:7001/refund", {
+              openId: this.orderDetail.openId,
+              appid: "wx083cd7624c4db2ec",
+              mch_id: "1513854421",
+              out_trade_no: this.orderDetail.out_trade_no,
+              out_refund_no: out_refund_no,
+              total_fee: this.orderDetail.total_fee * 100,
+              refund_fee: this.orderDetail.total_fee * 100
+            })
+            .then(res => {
+              console.log(res.data);
+              // 退款失败弹出警告提示失败原因
+              if (res.data.split("result_code")[1].slice(10, -5) === "FAIL") {
+                let err = res.data.split("err_code_des")[1].slice(10, -5);
+                this.$message.error(err);
+              } else if (
+                // 退款成功
+                res.data.split("result_code")[1].slice(10, -5) === "SUCCESS"
+              ) {
+                this.$message({
+                  type: "success",
+                  message: "退款成功!"
+                });
+                axios.post("http://127.0.0.1:7001/changeStatus", {
+                  out_trade_no: this.orderDetail.out_trade_no,
+                  status: "退款成功"
+                });
+                this.$router.push({ path: "/orders" });
+              }
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消退款"
           });
         });
     }
