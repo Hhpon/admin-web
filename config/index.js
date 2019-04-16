@@ -12,19 +12,19 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/gettoken': {
-        target: 'http://localhost:7001',
+        target: 'https://home.hhp.im',
         changeOrigin: true
       },
       '/uploadMes': {
-        target: 'http://localhost:7001',
+        target: 'https://home.hhp.im',
         changeOrigin: true
       },
       '/gettableGoods': {
-        target: 'http://localhost:7001',
+        target: 'https://home.hhp.im',
         changeOrigin: true
       },
       '/deleteGood':{
-        target: 'http://localhost:7001',
+        target: 'https://home.hhp.im',
         changeOrigin: true
       }
     },

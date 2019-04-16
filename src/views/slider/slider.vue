@@ -148,11 +148,13 @@ export default {
     },
     // 上传图片成功以后获取图片的 url
     handleTitle(response, file, fileList) {
-      const titleUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      // const titleUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      const titleUrl = "https://cdn.hhp.im/" + response.key;
       this.goodsList.titleUrl = titleUrl;
     },
     handleDetails(response, file, fileList) {
-      var detailsUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      // var detailsUrl = "http://pczgqj6xt.bkt.clouddn.com/" + response.key;
+      var detailsUrl = "https://cdn.hhp.im/" + response.key;
       this.goodsList.detailsUrl.push(detailsUrl);
     }
   }

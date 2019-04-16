@@ -61,7 +61,7 @@ export default {
         })
           .then(() => {
             axios
-              .post("http://127.0.0.1:7001/deleteOrders", {
+              .post("https://home.hhp.im/deleteOrders", {
                 out_trade_no: row.out_trade_no
               })
               .then(res => {
@@ -84,7 +84,7 @@ export default {
       }
     },
     getOrders() {
-      axios.get("http://127.0.0.1:7001/getOrder").then(res => {
+      axios.get("https://home.hhp.im/getOrder").then(res => {
         let refundOrder = [];
         let othersOrder = [];
         for (var i = 0; i < res.data.length; i++) {
