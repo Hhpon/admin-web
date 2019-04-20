@@ -84,7 +84,7 @@ export default {
       })
         .then(() => {
           axios
-            .post("https://home.hhp.im/changeStatus", {
+            .post("/changeStatus", {
               out_trade_no: this.orderDetail.out_trade_no,
               status: "待收货"
             })
@@ -95,12 +95,12 @@ export default {
                   message: "发货成功!"
                 });
                 this.$router.push({ path: "/orders" });
-                setTimeout(() => {
-                  axios.post("https://home.hhp.im/changeStatus", {
-                    out_trade_no: this.orderDetail.out_trade_no,
-                    status: "已完成"
-                  });
-                }, 1296000000);
+                // setTimeout(() => {
+                //   axios.post("/changeStatus", {
+                //     out_trade_no: this.orderDetail.out_trade_no,
+                //     status: "已完成"
+                //   });
+                // }, 1296000000);
               }
             });
         })
@@ -135,7 +135,7 @@ export default {
           let out_refund_no = "re" + year + month + date + time;
 
           axios
-            .post("https://home.hhp.im/refund", {
+            .post("/refund", {
               openId: this.orderDetail.openId,
               appid: "wx083cd7624c4db2ec",
               mch_id: "1513854421",
@@ -158,7 +158,7 @@ export default {
                   type: "success",
                   message: "退款成功!"
                 });
-                axios.post("https://home.hhp.im/changeStatus", {
+                axios.post("/changeStatus", {
                   out_trade_no: this.orderDetail.out_trade_no,
                   status: "退款成功"
                 });

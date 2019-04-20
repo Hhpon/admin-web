@@ -5,16 +5,12 @@
         <el-table-column align="center" prop="name" label="商品"></el-table-column>
         <el-table-column align="center" prop="price" label="价格"></el-table-column>
         <el-table-column align="center" prop="classifyValue" label="分类"></el-table-column>
-        <el-table-column align="center" prop="sliderView" label="轮播"></el-table-column>
         <el-table-column align="center" prop="saleAmount" label="销量"></el-table-column>
         <el-table-column align="center" prop="amount" label="库存"></el-table-column>
         <el-table-column label="操作" align="center" width="300">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            <!-- <el-button
-              size="mini"
-            @click="handleDelete(scope.$index, scope.row)">{{buttonValue}}</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -55,7 +51,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogeditForm = false">取 消</el-button>
-        <el-button type="primary" @click="dialogeditForm = false">确 定</el-button>
+        <el-button type="primary" @click="handleConfirm()">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -71,27 +67,27 @@ export default {
       editGoodslist: {},
       classify: [
         {
-          value: "1",
+          value: "0",
           label: "热卖"
         },
         {
-          value: "2",
+          value: "1",
           label: "水果"
         },
         {
-          value: "3",
+          value: "2",
           label: "生鲜"
         },
         {
-          value: "4",
+          value: "3",
           label: "速食"
         },
         {
-          value: "5",
+          value: "4",
           label: "日百"
         },
         {
-          value: "6",
+          value: "5",
           label: "生活服务"
         }
       ],
@@ -105,11 +101,49 @@ export default {
     this.gettableGoods();
   },
   methods: {
+    // 编辑商品弹窗
     handleEdit(index, row) {
-      console.log(index, row);
       this.dialogeditForm = true;
       this.editGoodslist = row;
     },
+
+    // 修改商品信息
+    handleConfirm() {
+      this.dialogeditForm = false;
+      var goodList = this.editGoodslist;
+      for (var i = 0; i < goodList.classifyValue.length; i++) {
+        if (goodList.classifyValue[i] === "热卖") {
+          goodList.classifyValue[i] = "0";
+        }
+        if (goodList.classifyValue[i] === "水果") {
+          goodList.classifyValue[i] = "1";
+        }
+        if (goodList.classifyValue[i] === "生鲜") {
+          goodList.classifyValue[i] = "2";
+        }
+        if (goodList.classifyValue[i] === "速食") {
+          goodList.classifyValue[i] = "3";
+        }
+        if (goodList.classifyValue[i] === "日百") {
+          goodList.classifyValue[i] = "4";
+        }
+        if (goodList.classifyValue[i] === "生活服务") {
+          goodList.classifyValue[i] = "5";
+        }
+      }
+
+      axios.post("/updateGood", { goodList: goodList }).then(res => {
+        if (res.data === "修改商品成功") {
+          this.$message({
+            type: "success",
+            message: "修改商品成功!"
+          });
+          this.gettableGoods();
+        }
+      });
+    },
+
+    // 删除商品
     handleDelete(index, row) {
       console.log(index, row);
       this.$confirm("此操作不可逆，是否确认删除该商品?", "提示", {
@@ -120,11 +154,15 @@ export default {
         .then(() => {
           axios
             .post("/deleteGood", {
-              goodsId: row.goodsId,
-              sliderView: row.sliderView
+              goodsId: row.goodsId
             })
             .then(res => {
-              console.log(res);
+              if (res.data === "删除商品成功") {
+                this.$message({
+                  type: "success",
+                  message: "删除商品成功!"
+                });
+              }
               this.gettableGoods();
             });
         })
@@ -135,9 +173,32 @@ export default {
           });
         });
     },
+
+    // 获取商品
     gettableGoods() {
       axios.get("/gettableGoods").then(res => {
-        console.log(res);
+        for (var i = 0; i < res.data.length; i++) {
+          for (var j = 0; j < res.data[i].classifyValue.length; j++) {
+            if (res.data[i].classifyValue[j] === "0") {
+              res.data[i].classifyValue[j] = "热卖";
+            }
+            if (res.data[i].classifyValue[j] === "1") {
+              res.data[i].classifyValue[j] = "水果";
+            }
+            if (res.data[i].classifyValue[j] === "2") {
+              res.data[i].classifyValue[j] = "生鲜";
+            }
+            if (res.data[i].classifyValue[j] === "3") {
+              res.data[i].classifyValue[j] = "速食";
+            }
+            if (res.data[i].classifyValue[j] === "4") {
+              res.data[i].classifyValue[j] = "日百";
+            }
+            if (res.data[i].classifyValue[j] === "5") {
+              res.data[i].classifyValue[j] = "生活服务";
+            }
+          }
+        }
         this.tableGoods = res.data;
       });
     }

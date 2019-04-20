@@ -26,6 +26,26 @@ module.exports = {
       '/deleteGood':{
         target: 'https://home.hhp.im',
         changeOrigin: true
+      },
+      '/changeStatus':{
+        target: 'https://home.hhp.im',
+        changeOrigin: true
+      },
+      '/refund':{
+        target: 'https://home.hhp.im',
+        changeOrigin: true
+      },
+      '/deleteOrders':{
+        target: 'https://home.hhp.im',
+        changeOrigin: true
+      },
+      '/getOrder':{
+        target: 'https://home.hhp.im',
+        changeOrigin: true
+      },
+      '/updateGood':{
+        target: 'https://home.hhp.im',
+        changeOrigin: true
       }
     },
 
