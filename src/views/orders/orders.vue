@@ -61,7 +61,7 @@ export default {
         })
           .then(() => {
             axios
-              .post("http://127.0.0.1:7001/deleteOrders", {
+              .post("/deleteOrders", {
                 out_trade_no: row.out_trade_no
               })
               .then(res => {
@@ -70,7 +70,6 @@ export default {
                     type: "success",
                     message: "删除订单成功!"
                   });
-                  // location.reload();
                   this.getOrders();
                 }
               });
@@ -84,13 +83,35 @@ export default {
       }
     },
     getOrders() {
-      axios.get("http://127.0.0.1:7001/getOrder").then(res => {
+      axios.get("/getOrder").then(res => {
         let refundOrder = [];
         let othersOrder = [];
         for (var i = 0; i < res.data.length; i++) {
           if (res.data[i].status === "退款中") {
             refundOrder.unshift(res.data[i]);
           } else {
+            if (res.data[i].status === "待收货") {
+              let time =
+                new Date().getTime() -
+                Number(res.data[i].out_trade_no.slice(8));
+              if (time > 1296000000) {
+                axios.post("/changeStatus", {
+                  out_trade_no: res.data[i].out_trade_no,
+                  status: "已完成"
+                });
+              }
+            }
+            if (res.data[i].status === "待付款") {
+              let time =
+                new Date().getTime() -
+                Number(res.data[i].out_trade_no.slice(8));
+              if (time > 1800000) {
+                axios.post("/changeStatus", {
+                  out_trade_no: res.data[i].out_trade_no,
+                  status: "已关闭"
+                });
+              }
+            }
             othersOrder.unshift(res.data[i]);
           }
         }
